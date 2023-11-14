@@ -1,0 +1,28 @@
+# This root entry is automatically created by us setting the environment variables in docker-compose.yml
+# dn: dc=waldorfconnect,dc=de
+# objectClass: top
+# objectClass: dcObject
+# objectClass: organization
+# o: waldorfconnect
+# dc: waldorfconnect
+
+
+dn: ou=People,dc=waldorfconnect,dc=de
+objectClass: organizationalUnit
+ou: People
+
+dn: uid=admin,ou=People,dc=waldorfconnect,dc=de
+objectClass: inetOrgPerson
+cn: Admin
+sn: Admin
+uid: admin
+mail: admin@waldorfconnect.de
+userPassword: {CLEARTEXT}password
+
+dn: uid=john.doe,ou=People,dc=waldorfconnect,dc=de
+objectClass: inetOrgPerson
+cn: John Doe
+sn: Doe
+uid: john.doe
+mail: john.doe@waldorfconnect.de
+userPassword: {CLEARTEXT}johnspassword

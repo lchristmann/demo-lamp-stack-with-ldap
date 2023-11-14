@@ -1,0 +1,70 @@
+version: '3' # Docker Compose version
+services:
+
+  # The MySQL database
+  db: 
+    image: mysql:latest
+    environment:
+      - MYSQL_DATABASE=php_docker
+      - MYSQL_USER=php_docker #  The php_docker user
+      - MYSQL_PASSWORD=password
+      - MYSQL_ALLOW_EMPTY_PASSWORD=1 # The root user will have a blank password (which is hereby allowed)
+    volumes:
+      - "./db:/docker-entrypoint-initdb.d" # Sync SQL files with container
+  # It cannot be reached from the host machine, e.g. your local computer, because the container doesn't expose any ports
+  # It can we reached within the virtual Docker network via its service name (`db`) and the default MySQL port (3306)
+
+
+  # The MySQL database administration tool phpMyAdmin
+  phpMyAdmin:
+    image: phpmyadmin:latest
+    ports:
+      - 8001:80
+    environment:
+      - PMA_HOST=db
+      - PMA_PORT=3306
+    depends_on:
+      - db
+    # Log in on `localhost:8001` with the username `php_docker` and password `password`
+
+
+  # The LDAP server
+  ldap:
+    image: osixia/openldap:latest
+    command: ["--copy-service", "--loglevel", "debug"]
+    environment:
+      - LDAP_ADMIN_PASSWORD=password
+      - LDAP_ORGANISATION=waldorfconnect
+      - LDAP_DOMAIN=waldorfconnect.de
+      # The root LDAP entry "dn: dc=waldorfconnect,dc=de" is hereby created automatically | When 
+      - "LDAP_BASE_DN=dc=waldorfconnect,dc=de"
+    # Seed LDAP database with ldif as in the docs: https://github.com/osixia/docker-openldap#seed-ldap-database-with-ldif
+    volumes:
+      - "./ldap:/container/service/slapd/assets/config/bootstrap/ldif/custom"
+
+
+  
+  # The LDAP server administration tool phpLdapAdmin
+  phpLdapAdmin:
+    image: osixia/phpldapadmin:latest
+    ports:
+      - 8002:80
+    environment:
+      - PHPLDAPADMIN_HTTPS=false
+      - PHPLDAPADMIN_LDAP_HOSTS=ldap
+    depends_on:
+      - ldap
+    # Log in on `localhost:8002` with the DN `cn=admin,dc=waldorfconnect,dc=de` and password `password`
+
+
+  # A PHP website with multiple pages
+  website:
+    build: . # Take the docker file from the current working directory
+    volumes:
+      - "./:/var/www/html" # Sync current working directory with the container's web directory
+    ports:
+      - 80:80 # Bind port 80 on our local machine to port 80 on the container
+      - 443:443 # For future HTTPS traffic
+    depends_on:
+      - db
+      - ldap
