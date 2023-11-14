@@ -43,3 +43,30 @@ This project demonstrates how to setup an application using the LAMP Stack (Linu
 
 - localhost or localhost:80 or localhost/index.php
 - localhost/test.php
+
+## Screenshots
+
+![Container Overview](docs/containerOverview.png)
+
+<u>5 Containers:</u>
+
+- MySQL database
+- phpMyAdmin
+  - accesses and depends on the database
+- LDAP server
+- phpLdapAdmin
+  - accesses and depends on the LDAP server
+- website
+  - accesses and depends on the database and the LDAP server
+
+<hr><br>
+
+![phpMyAdminScreenshot](docs/phpMyAdminScreenshot.png)
+
+<hr><br>
+
+![phpLdapAdmin](docs/phpLdapAdminScreenshot.png)
+
+<hr><br>
+
+![websiteScreenshot](docs/websiteScreenshot.png)
